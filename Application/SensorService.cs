@@ -3,6 +3,7 @@ using Application.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Application
 {
@@ -57,6 +58,20 @@ namespace Application
             var results = mapper.Map<List<AuditLogDto>>(logs);
 
             return results;
+        }
+
+        public async Task<DeviceMetrics> CalculateMetricsAsync(int deviceId, int lastNHours = 1)
+        {
+            var result = await deviceReadingRepository.CalcualteMetricsAsync(deviceId, lastNHours);
+
+            return result;
+        }
+
+        public async Task<DeviceStatistics> CalculateStatsAsync(int deviceId)
+        {
+            var result = await deviceReadingRepository.CalculateStatsAsync(deviceId);
+
+            return result;
         }
     }
 }

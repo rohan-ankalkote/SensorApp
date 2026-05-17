@@ -1,12 +1,71 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Persistence.Repositories
 {
-    public class DeviceReadingRepository(SensorContext sensorContext) : IDeviceReadingRepository
+    public class DeviceReadingRepository(SensorContext sensorContext, ILogger<DeviceReadingRepository> logger) : IDeviceReadingRepository
     {
+        public async Task<DeviceMetrics> CalcualteMetricsAsync(int deviceId, int pastNHowrs)
+        {
+            var from = DateTime.Now.AddHours(-1 * pastNHowrs);
+            var threshold = await sensorContext.Devices.Where(d => d.Id == deviceId).Select(d => d.Threshold).FirstOrDefaultAsync();
+
+            var query = sensorContext.DeviceReadings.Where(r => r.ReadingTime >= from && r.DeviceId == deviceId);
+
+            var result = query.GroupBy(k => k.DeviceId, e => e, (k, g) => new DeviceMetrics
+            {
+                Threshold = threshold,
+                Average = g.Average(x => x.PrimaryValue),
+                Maximum = g.Max(x => x.PrimaryValue)
+            }).FirstOrDefault();
+
+            if(result == null)
+            {
+                logger.LogWarning("No data found for device {DeviceId}", deviceId);
+                throw new Exception($"No data found while calculating metrics for device {deviceId}");
+            }
+
+            sensorContext.AuditLogs.Add(new()
+            {
+                Flag = 0,
+                Message = $"calc device id = {deviceId}",
+                CreatedAt = DateTime.Now,
+                DeviceId = deviceId
+            });
+
+            await sensorContext.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<DeviceStatistics> CalculateStatsAsync(int deviceId)
+        {
+            var query = sensorContext.DeviceReadings.AsQueryable();
+
+            var result = await query.Where(r => r.DeviceId == deviceId).GroupBy(k => k.DeviceId, e => e, (k, g) => new DeviceStatistics
+            {
+                Total = g.Count(),
+                Maximum = g.Max(x => x.PrimaryValue),
+                Minimum = g.Min(x => x.PrimaryValue),
+                Average = g.Average(x => x.PrimaryValue),
+                LastReadingTime = g.Max(x => x.ReadingTime),
+                Alerts = g.SelectMany(x => x.ThresholdAlerts!).Count(),
+                Readings = g.Count()
+            }).FirstOrDefaultAsync();
+
+            if (result == null)
+            {
+                logger.LogWarning("No data found for device {DeviceId}", deviceId);
+                throw new Exception($"No data found while calculating statistics for device {deviceId}");
+            }
+
+            return result;
+        }
+
         public async Task<List<DeviceReading>> GetDeviceReadingsAsync(DeviceType? deviceType = null, int? deviceId = null, DateTime? from = null, DateTime? to = null)
         {
             var query = sensorContext.DeviceReadings.AsQueryable();

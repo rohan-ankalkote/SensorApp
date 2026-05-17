@@ -64,5 +64,21 @@ namespace SensorApp.Controllers
 
             return Ok(logs);
         }
+
+        [HttpGet("device/calculate-metrics/{deviceId:int}/{lastNHours:int}")]
+        public async Task<IActionResult> GetMetricsAsync(int deviceId, int lastNHours)
+        {
+            var result = await sensorService.CalculateMetricsAsync(deviceId, lastNHours);
+
+            return Ok(result);
+        }
+
+        [HttpGet("device/calculate-stats/{deviceId:int}")]
+        public async Task<IActionResult> GetStatsAsync(int deviceId)
+        {
+            var result = await sensorService.CalculateStatsAsync(deviceId);
+
+            return Ok(result);
+        }
     }
 }

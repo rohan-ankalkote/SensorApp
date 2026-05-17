@@ -1,5 +1,6 @@
 ﻿using Application.Dtos;
 using Domain.Enums;
+using Domain.ValueObjects;
 
 namespace Application.Interfaces
 {
@@ -12,5 +13,8 @@ namespace Application.Interfaces
         Task<List<DeviceReadingDto>> GetDeviceReadingsAsync(DeviceReadingFilterCriteria criteria);
 
         Task<List<AuditLogDto>> GetAuditLogsAsync(int deviceId, int flag = -1);
+
+        Task<DeviceMetrics> CalculateMetricsAsync(int deviceId, int lastNHours = 1);
+        Task<DeviceStatistics> CalculateStatsAsync(int deviceId);
     }
 }
