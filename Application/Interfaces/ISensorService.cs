@@ -10,5 +10,7 @@ namespace Application.Interfaces
 
         Task<bool> CreateDeviceReadingAsync(DeviceReadingDto deviceReadingDto);
         Task<List<DeviceReadingDto>> GetDeviceReadingsAsync(DeviceReadingFilterCriteria criteria);
+
+        Task<List<AuditLogDto>> GetAuditLogsAsync(int deviceId, int flag = -1);
     }
 }

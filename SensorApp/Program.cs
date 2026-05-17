@@ -17,6 +17,7 @@ builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<ISensorService, SensorService>();
 builder.Services.AddAutoMapper(config => config.AddProfile<MappingProfile>());
 builder.Services.AddScoped<IDeviceReadingRepository, DeviceReadingRepository>();
+builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 var app = builder.Build();
 

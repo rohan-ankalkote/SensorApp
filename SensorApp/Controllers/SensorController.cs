@@ -56,5 +56,13 @@ namespace SensorApp.Controllers
 
             return Ok(dtos);
         }
+
+        [HttpGet("logs/{deviceId:int}/{flag:int}")]
+        public async Task<IActionResult> GetLogsAsync(int deviceId, int flag = -1)
+        {
+            var logs = await sensorService.GetAuditLogsAsync(deviceId, flag);
+
+            return Ok(logs);
+        }
     }
 }
