@@ -1,11 +1,8 @@
 using Application;
 using Application.Interfaces;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 using Persistence.Repositories;
-using System.ComponentModel;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +15,8 @@ builder.Services.AddDbContext<SensorContext>(o => o.UseSqlite(builder.Configurat
 builder.Services.AddScoped<ISeedRepository, SeedRepository>();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<ISensorService, SensorService>();
+builder.Services.AddAutoMapper(config => config.AddProfile<MappingProfile>());
+builder.Services.AddScoped<IDeviceReadingRepository, DeviceReadingRepository>();
 
 var app = builder.Build();
 

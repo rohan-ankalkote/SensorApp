@@ -1,7 +1,6 @@
 ﻿using Application.Dtos;
 using Application.Interfaces;
 using Domain.Enums;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SensorApp.Controllers
@@ -32,6 +31,30 @@ namespace SensorApp.Controllers
             }
 
             throw new Exception("Device not upserted!");
+        }
+
+        [HttpPost("device/data")]
+        public async Task<IActionResult> CreateDeviceDataAsync(DeviceReadingDto deviceReadingDto)
+        {
+            var inserted = await sensorService.CreateDeviceReadingAsync(deviceReadingDto);
+
+            if (inserted)
+            {
+                return Ok(new
+                {
+                    Message = "Reading inserted."
+                });
+            }
+
+            throw new Exception("Reading not inserted!");
+        }
+
+        [HttpPost("device/data/getbycriteria")]
+        public async Task<IActionResult> GetDeviceReadingsAsync(DeviceReadingFilterCriteria criteria)
+        {
+            var dtos = await sensorService.GetDeviceReadingsAsync(criteria);
+
+            return Ok(dtos);
         }
     }
 }

@@ -7,5 +7,8 @@ namespace Application.Interfaces
     {
         Task<List<DeviceDto>> GetDevicesAsync(DeviceStatus deviceStatus = DeviceStatus.ACTIVE);
         Task<bool> UpsertDeviceAsync(DeviceDto deviceDto);
+
+        Task<bool> CreateDeviceReadingAsync(DeviceReadingDto deviceReadingDto);
+        Task<List<DeviceReadingDto>> GetDeviceReadingsAsync(DeviceReadingFilterCriteria criteria);
     }
 }
