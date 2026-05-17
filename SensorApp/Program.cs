@@ -1,12 +1,32 @@
+using Application;
+using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
+using Persistence.Repositories;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(config =>
+{
+    config.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SensorContext>(o => o.UseSqlite(builder.Configuration["ConnectionStrings:Sqlite"]));
+builder.Services.AddScoped<ISeedRepository, SeedRepository>();
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<ISensorService, SensorService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seedRepository = scope.ServiceProvider.GetRequiredService<ISeedRepository>();
+
+    await seedRepository.SeedAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {

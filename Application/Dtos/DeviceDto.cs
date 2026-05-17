@@ -1,21 +1,18 @@
-﻿using Domain.Enums;
-
-namespace Domain.Entities
+﻿namespace Application.Dtos
 {
-    public class Device
+    public class DeviceDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
-        public DeviceType Type { get; set; }
-        public DeviceStatus Status { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
         public int Threshold { get; set; }
-        public Unit Unit { get; set; }
+        public string Unit { get; set; } = string.Empty;
         public int Interval { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public List<AuditLog>? AuditLogs { get; set; }
-        public List<DeviceReading>? Readings { get; set; }
+        public List<string> Errors { get; set; } = [];
     }
 }
